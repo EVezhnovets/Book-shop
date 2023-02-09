@@ -50,6 +50,7 @@ namespace BulkyBookWeb.Controllers
                 return NotFound();
             }
             var categoryFromDb = _db.Categories.Find(id);
+            //other variants
             //var categoryFromDbFirst = _db.Categories.FirstOrDefault(u => u.Id == id);
             //var categoryFromDbSingle = _db.Categories.SingleOrDefault(u => u.Id == id);
 
@@ -71,7 +72,7 @@ namespace BulkyBookWeb.Controllers
             }
             if (ModelState.IsValid)
             {
-                _db.Categories.Add(obj);
+                _db.Categories.Update(obj);
                 _db.SaveChanges();
                 return RedirectToAction("Index");
             }
