@@ -47,26 +47,22 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
         }
 
         //GET
-        public IActionResult Edit(int? id)
+        public IActionResult Upsert(int? id)
         {
+            Product product = new Product();
             if (id == null || id == 0)
             {
-                return NotFound();
+                //crete product
+                return View(product);
             }
 
-            var coverTypeFromDbFirst = _unitOfWork.CoverType.GetFirstOrDefault(u => u.Id == id);
-
-            if (coverTypeFromDbFirst == null)
-            {
-                return NotFound();
-            }
-            return View(coverTypeFromDbFirst);
+            return View(product);
         }
 
         //POST
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(CoverType obj)
+        public IActionResult Upsert(CoverType obj)
         {
             //if (obj.Name == obj.DisplayOrder.ToString())
             //{
