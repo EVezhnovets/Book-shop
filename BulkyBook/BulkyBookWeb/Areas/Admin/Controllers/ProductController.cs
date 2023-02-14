@@ -145,7 +145,7 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
         public IActionResult GetAll()
         {
             var productList = _unitOfWork.Product.GetAll();
-            return Json(new { data = productList });
+            return Json(new {data=productList});
         }
         #endregion
     }
