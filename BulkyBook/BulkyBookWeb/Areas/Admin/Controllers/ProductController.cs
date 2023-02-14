@@ -75,8 +75,11 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
                 //ViewData["CoverTypeList"] = CoverTypeList;
                 return View(productVM);
             }
-
-            return View(productVM);
+            else
+            {
+                productVM.Product = _unitOfWork.Product.GetFirstOrDefault(i => i.Id == id);
+                return View(productVM);
+            }
         }
 
         //POST
