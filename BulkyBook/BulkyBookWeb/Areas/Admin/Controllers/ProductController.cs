@@ -24,12 +24,6 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
             return View();
         }
 
-        //GET
-        public IActionResult Create()
-        {
-            return View();
-        }
-
         //POST
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -52,9 +46,9 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
         //GET
         public IActionResult Upsert(int? id)
         {
-            ProductVM productVM = new ProductVM()
+            ProductVM productVM = new()
             {
-                Product = new Product(),
+                Product = new(),
                 CategoryList = _unitOfWork.Category.GetAll().Select(i => new SelectListItem
                 {
                     Text = i.Name,
@@ -66,39 +60,40 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
                     Value = i.Id.ToString()
                 }),
             };
-        
 
             if (id == null || id == 0)
             {
-                //crete product
+                //create product
                 //ViewBag.CategoryList = CategoryList;
                 //ViewData["CoverTypeList"] = CoverTypeList;
                 return View(productVM);
             }
             else
             {
-                productVM.Product = _unitOfWork.Product.GetFirstOrDefault(i => i.Id == id);
+                productVM.Product = _unitOfWork.Product.GetFirstOrDefault(u => u.Id == id);
                 return View(productVM);
+
             }
         }
 
-        //POST
-        [HttpPost]
+                //POST
+                [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Upsert(ProductVM obj, IFormFile file)
+        public IActionResult Upsert(ProductVM obj, IFormFile? file)
         {
+
             if (ModelState.IsValid)
             {
-                string wwwRoothPath = _hostEnvironment.WebRootPath;
-                if(file!= null)
+                string wwwRootPath = _hostEnvironment.WebRootPath;
+                if (file != null)
                 {
                     string fileName = Guid.NewGuid().ToString();
-                    var uploads = Path.Combine(wwwRoothPath, @"images\products");
+                    var uploads = Path.Combine(wwwRootPath, @"images\products");
                     var extension = Path.GetExtension(file.FileName);
 
                     if (obj.Product.ImageUrl != null)
                     {
-                        var oldImagePath = Path.Combine(wwwRoothPath, obj.Product.ImageUrl.TrimStart('\\'));
+                        var oldImagePath = Path.Combine(wwwRootPath, obj.Product.ImageUrl.TrimStart('\\'));
                         if (System.IO.File.Exists(oldImagePath))
                         {
                             System.IO.File.Delete(oldImagePath);
@@ -109,7 +104,8 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
                     {
                         file.CopyTo(fileStreams);
                     }
-                    obj.Product.ImageUrl = @"images\products\" + fileName + extension;
+                    obj.Product.ImageUrl = @"\images\products\" + fileName + extension;
+
                 }
                 if (obj.Product.Id == 0)
                 {
@@ -119,45 +115,11 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
                 {
                     _unitOfWork.Product.Update(obj.Product);
                 }
-                
                 _unitOfWork.Save();
-                TempData["Success"] = "Product created successfully";
+                TempData["success"] = "Product created successfully";
                 return RedirectToAction("Index");
             }
             return View(obj);
-        }
-
-        //GET
-        public IActionResult Delete(int? id)
-        {
-            if (id == null || id == 0)
-            {
-                return NotFound();
-            }
-           
-            var categoryFromDbFirst = _unitOfWork.CoverType.GetFirstOrDefault(u => u.Id == id);
-
-            if (categoryFromDbFirst == null)
-            {
-                return NotFound();
-            }
-            return View(categoryFromDbFirst);
-        }
-
-        //POST
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public IActionResult DeletePOST(int? id)
-        {
-            var obj = _unitOfWork.CoverType.GetFirstOrDefault(u => u.Id == id);
-            if (obj == null)
-            {
-                return NotFound();
-            }
-            _unitOfWork.CoverType.Remove(obj);
-            _unitOfWork.Save();
-            TempData["Success"] = "Cover Type deleted successfully";
-            return RedirectToAction("Index");
         }
 
         #region API CALLS
@@ -166,6 +128,28 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
         {
             var productList = _unitOfWork.Product.GetAll(includeProperties:"Category,CoverType");
             return Json(new {data=productList});
+        }
+
+        //POST
+        [HttpDelete]
+        public IActionResult Delete(int? id)
+        {
+            var obj = _unitOfWork.Product.GetFirstOrDefault(u => u.Id == id);
+            if (obj == null)
+            {
+                return Json(new { success = false, message = "Error while deleting" });
+            }
+
+            var oldImagePath = Path.Combine(_hostEnvironment.WebRootPath, obj.ImageUrl.TrimStart('\\'));
+            if (System.IO.File.Exists(oldImagePath))
+            {
+                System.IO.File.Delete(oldImagePath);
+            }
+
+            _unitOfWork.Product.Remove(obj);
+            _unitOfWork.Save();
+            return Json(new { success = true, message = "Delete Successful" });
+
         }
         #endregion
     }
