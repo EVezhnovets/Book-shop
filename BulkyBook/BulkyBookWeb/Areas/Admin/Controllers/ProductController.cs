@@ -24,25 +24,6 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
             return View();
         }
 
-        //POST
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Create(CoverType obj)
-        {
-            //if (obj.Name == obj.DisplayOrder.ToString())
-            //{
-            //    ModelState.AddModelError("CustomError", "The DisolayOrder cannot exactly match the Name.");
-            //}
-            if (ModelState.IsValid)
-            {
-                _unitOfWork.CoverType.Add(obj);
-                _unitOfWork.Save();
-                TempData["Success"] = "Cover Type created successfully";
-                return RedirectToAction("Index");
-            }
-            return View(obj);
-        }
-
         //GET
         public IActionResult Upsert(int? id)
         {
@@ -63,9 +44,6 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
 
             if (id == null || id == 0)
             {
-                //create product
-                //ViewBag.CategoryList = CategoryList;
-                //ViewData["CoverTypeList"] = CoverTypeList;
                 return View(productVM);
             }
             else
