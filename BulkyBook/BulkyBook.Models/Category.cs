@@ -5,7 +5,6 @@ namespace BulkyBook.Models
 {
     public class Category
     {
-        //Make Id primary key 
         [Key]
         public int Id { get; set; }
         [Required]
